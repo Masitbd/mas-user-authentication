@@ -127,10 +127,37 @@ const getSIngleUser = async (data: Partial<IUser>) => {
       },
     },
   ]);
-  console.log(result);
+
+  return result;
+};
+
+const getALluser = async () => {
+  const result = await Profile.aggregate([
+    {
+      $lookup: {
+        from: 'userpermissions',
+        localField: 'uuid',
+        foreignField: 'uuid',
+        as: 'permissions',
+      },
+    },
+    {
+      $unwind: {
+        path: '$permissions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ]);
+  return result;
+};
+
+const patchUser = async (uuid: string, data: Partial<IUser>) => {
+  const result = await User.findOneAndUpdate({ uuid: uuid }, data);
   return result;
 };
 export const UserService = {
   createUser,
   getSIngleUser,
+  getALluser,
+  patchUser,
 };

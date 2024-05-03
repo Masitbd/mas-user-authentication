@@ -17,5 +17,63 @@ const createPermission: RequestHandler = catchAsync(
     });
   }
 );
+const getAllPermission: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await PermsisionService.fetchPermissions();
 
-export const PermissionController = { createPermission };
+    sendResponse<IPermission[]>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Permission created successfully!',
+      data: result,
+    });
+  }
+);
+const getSinglelPermission: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await PermsisionService.fetchSingle(id);
+
+    sendResponse<IPermission>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Permission created successfully!',
+      data: result,
+    });
+  }
+);
+
+const updatePermission: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await PermsisionService.patchPermission(
+      req.body,
+      req.params.id
+    );
+    sendResponse<IPermission>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Permission created successfully!',
+      data: result,
+    });
+  }
+);
+
+const removePermission: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await PermsisionService.deletePermission(req.params.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Permission created successfully!',
+      data: result,
+    });
+  }
+);
+
+export const PermissionController = {
+  createPermission,
+  getAllPermission,
+  getSinglelPermission,
+  updatePermission,
+  removePermission,
+};
