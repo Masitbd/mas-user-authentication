@@ -14,3 +14,11 @@ export type IGenericErrorResponse = {
   message: string;
   errorMessages: IGenericErrorMessage[];
 };
+
+export type IGenericDecodedTokenData = {
+  uuid: string;
+  role: string;
+  permissions: number[];
+  iat: number;
+  exp: number;
+};

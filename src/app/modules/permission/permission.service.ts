@@ -1,3 +1,5 @@
+import { ENUM_USER_PEMISSION } from '../../../enums/user';
+import { IGenericDecodedTokenData } from '../../../interfaces/common';
 import { Permission } from './permission.model';
 import { IPermission } from './permisson.interface';
 
@@ -6,8 +8,24 @@ const createPermission = async (params: IPermission) => {
   return result;
 };
 
-const fetchPermissions = async () => {
-  const result = await Permission.find();
+const fetchPermissions = async (user: IGenericDecodedTokenData) => {
+  if (user?.permissions?.includes(ENUM_USER_PEMISSION.SUPER_ADMIN)) {
+    const result = await Permission.find();
+    return result;
+  }
+  if (user?.permissions?.includes(ENUM_USER_PEMISSION.ADMIN)) {
+    const result = await Permission.find({
+      code: { $ne: ENUM_USER_PEMISSION.SUPER_ADMIN },
+    });
+
+    return result;
+  }
+
+  const result = await Permission.find({
+    code: {
+      $nin: [ENUM_USER_PEMISSION.ADMIN, ENUM_USER_PEMISSION.SUPER_ADMIN],
+    },
+  });
   return result;
 };
 const fetchSingle = async (id: string) => {

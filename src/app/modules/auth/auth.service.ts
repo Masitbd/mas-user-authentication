@@ -5,6 +5,7 @@ import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { Profile } from '../profile/profile.model';
+import { IUserResponse } from '../user/user.interface';
 import { User } from '../user/user.model';
 import {
   IChangePassword,
@@ -12,7 +13,6 @@ import {
   ILoginUserResponse,
   IRefreshTokenResponse,
 } from './auth.interface';
-import { sendEmail } from './sendResetMail';
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { uuid, password } = payload;
@@ -36,10 +36,15 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   //create access token & refresh token
 
-  const { uuid: userId, role, needsPasswordChange, permissions } = isUserExist;
+  const {
+    uuid: userId,
+    role,
+    needsPasswordChange,
+    permissions,
+  } = isUserExist as IUserResponse;
 
   const accessToken = jwtHelpers.createToken(
-    { uuid: userId, role, permissions: permissions.permissions },
+    { uuid: userId, role, permissions: permissions?.permissions },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
@@ -159,16 +164,16 @@ const forgotPass = async (payload: { uuid: string }) => {
 
   const resetLink: string = config.resetlink + `token=${passResetToken}`;
 
-  await sendEmail(
-    profile?.email,
-    `
-      <div>
-        <p>Hi, ${profile.name}</p>
-        <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
-        <p>Thank you</p>
-      </div>
-  `
-  );
+  // await sendEmail(
+  //   profile?.email,
+  //   `
+  //     <div>
+  //       <p>Hi, ${profile.name}</p>
+  //       <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
+  //       <p>Thank you</p>
+  //     </div>
+  // `
+  // );
 
   // return {
   //   message: "Check your email!"

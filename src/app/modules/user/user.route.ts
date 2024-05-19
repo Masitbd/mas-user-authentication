@@ -18,16 +18,6 @@ router.post(
 );
 
 router.get(
-  '/single',
-  auth(
-    ENUM_USER_PEMISSION.ADMIN,
-    ENUM_USER_PEMISSION.SUPER_ADMIN,
-    ENUM_USER_PEMISSION.USER
-  ),
-  UserController.getSingleUser
-);
-
-router.get(
   '/',
   auth(
     ENUM_USER_PEMISSION.ADMIN,
@@ -47,4 +37,13 @@ router.patch(
   UserController.updateUser
 );
 
+router.get(
+  '/:uuid',
+  auth(
+    ENUM_USER_PEMISSION.ADMIN,
+    ENUM_USER_PEMISSION.SUPER_ADMIN,
+    ENUM_USER_PEMISSION.GET_ALL_USER
+  ),
+  UserController.getUserByUUid
+);
 export const UserRoutes = router;

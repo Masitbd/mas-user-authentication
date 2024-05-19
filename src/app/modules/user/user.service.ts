@@ -78,7 +78,7 @@ const createUser = async (
 
   // if (newUserAllData) {
   //   await RedisClient.publish(
-  //     EVENT_STUDENT_CREATED,
+  //     EVENT_USER_CREATED,
   //     JSON.stringify(newUserAllData.profile)
   //   );
   // }
@@ -110,8 +110,8 @@ const getSIngleUser = async (data: Partial<IUser>) => {
     {
       $lookup: {
         from: 'userpermissions',
-        localField: '_id',
-        foreignField: '_id',
+        localField: 'uuid',
+        foreignField: 'uuid',
         as: 'permissions',
       },
     },
@@ -155,6 +155,7 @@ const patchUser = async (uuid: string, data: Partial<IUser>) => {
   const result = await User.findOneAndUpdate({ uuid: uuid }, data);
   return result;
 };
+
 export const UserService = {
   createUser,
   getSIngleUser,

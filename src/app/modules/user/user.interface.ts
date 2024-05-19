@@ -13,6 +13,15 @@ export type IUser = {
   permissions?: Types.ObjectId | IUserPermission;
 };
 
+export type IUserResponse = {
+  uuid: string;
+  role: string;
+  password: string;
+  needsPasswordChange: boolean;
+  passwordChangedAt?: Date;
+  profile?: IProfile;
+  permissions?: IUserPermission;
+};
 export type UserModel = {
   isUserExist(
     uuid: string

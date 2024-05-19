@@ -1,5 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import httpStatus from 'http-status';
+import { IGenericDecodedTokenData } from '../../../interfaces/common';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { PermsisionService } from './permission.service';
@@ -19,12 +20,14 @@ const createPermission: RequestHandler = catchAsync(
 );
 const getAllPermission: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await PermsisionService.fetchPermissions();
+    const result = await PermsisionService.fetchPermissions(
+      req.user as IGenericDecodedTokenData
+    );
 
     sendResponse<IPermission[]>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Permission created successfully!',
+      message: 'Permission featched successfully!',
       data: result,
     });
   }
@@ -37,7 +40,7 @@ const getSinglelPermission: RequestHandler = catchAsync(
     sendResponse<IPermission>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Permission created successfully!',
+      message: 'Permission featched successfully!',
       data: result,
     });
   }
@@ -52,7 +55,7 @@ const updatePermission: RequestHandler = catchAsync(
     sendResponse<IPermission>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Permission created successfully!',
+      message: 'Permission updated successfully!',
       data: result,
     });
   }
@@ -64,7 +67,7 @@ const removePermission: RequestHandler = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Permission created successfully!',
+      message: 'Permission deleted successfully!',
       data: result,
     });
   }

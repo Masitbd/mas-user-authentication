@@ -1,4 +1,4 @@
 export type IPermission = {
-  value: string;
+  label: string;
   code: number;
 };

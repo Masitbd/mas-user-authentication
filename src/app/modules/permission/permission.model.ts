@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 import { IPermission } from './permisson.interface';
 
 const permissionSchema = new Schema<IPermission>({
-  value: { type: String, required: true },
+  label: { type: String, required: true },
   code: { type: Number, unique: true, required: true },
 });
 
