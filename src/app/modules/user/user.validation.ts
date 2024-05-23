@@ -8,9 +8,11 @@ const createUserZodSchema = z.object({
       name: z.string({
         required_error: 'Name is required',
       }),
-      gender: z.string({ required_error: 'Gender is required' }),
-      dateOfBirth: z.string({
-        required_error: 'Date of birth is required',
+      fatherName: z.string({
+        required_error: 'Fatehr Name is required',
+      }),
+      motherName: z.string({
+        required_error: 'Mother  Name is required',
       }),
       email: z
         .string({
@@ -24,8 +26,6 @@ const createUserZodSchema = z.object({
       address: z.string({
         required_error: 'Address is required',
       }),
-
-      profileImage: z.string().optional(),
     }),
   }),
 });

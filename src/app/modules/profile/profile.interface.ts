@@ -5,5 +5,5 @@ export type IProfile = {
   phone: string;
   email: string;
   address: string;
-  uuid: string;
+  uuid?: string;
 };

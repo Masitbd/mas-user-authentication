@@ -15,10 +15,22 @@ const getSingleUserProfile: RequestHandler = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
+      message: 'Profile featched successfully!',
+      data: result,
+    });
+  }
+);
+const updateProfile: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await ProfileService.patchProfile(req.params.uuid, req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
       message: 'User created successfully!',
       data: result,
     });
   }
 );
 
-export const ProfileController = { getSingleUserProfile };
+export const ProfileController = { getSingleUserProfile, updateProfile };

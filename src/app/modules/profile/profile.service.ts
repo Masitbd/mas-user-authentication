@@ -1,5 +1,7 @@
 import { IGenericDecodedTokenData } from '../../../interfaces/common';
 import { User } from '../user/user.model';
+import { IProfile } from './profile.interface';
+import { Profile } from './profile.model';
 
 const fetchSIngleUserProfileData = async (data: IGenericDecodedTokenData) => {
   const result = await User.aggregate([
@@ -46,4 +48,8 @@ const fetchSIngleUserProfileData = async (data: IGenericDecodedTokenData) => {
   return result;
 };
 
-export const ProfileService = { fetchSIngleUserProfileData };
+const patchProfile = async (uuid: string, profileData: IProfile) => {
+  const result = await Profile.findOneAndUpdate({ uuid: uuid }, profileData);
+  return result;
+};
+export const ProfileService = { fetchSIngleUserProfileData, patchProfile };
