@@ -28,9 +28,12 @@ const createUser = async (
     user.uuid = id;
     profile.uuid = id;
 
-    // Creating user permissions and setting permissions to the user profile
-
+    //! Creating user permissions and setting permissions to the user profile. There is a security issue.That is need to be fixed
     const permissionData = { permissions: [3], uuid: id };
+    if (user.role == 'super-admin') {
+      permissionData.permissions = [3];
+    }
+
     const userPermission = await UserPermission.create([permissionData], {
       session,
     });
