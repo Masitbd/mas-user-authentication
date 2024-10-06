@@ -17,6 +17,8 @@ router.post(
   UserController.createUser
 );
 
+// For changing user password by super admin
+
 router.get(
   '/',
   auth(

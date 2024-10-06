@@ -28,10 +28,12 @@ const createUser = async (
     user.uuid = id;
     profile.uuid = id;
 
-    //! Creating user permissions and setting permissions to the user profile. There is a security issue.That is need to be fixed
     const permissionData = { permissions: [3], uuid: id };
     if (user.role == 'super-admin') {
-      permissionData.permissions = [1];
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        'You are not allowed to create super Admin'
+      );
     }
 
     const userPermission = await UserPermission.create([permissionData], {
@@ -78,13 +80,6 @@ const createUser = async (
       ],
     });
   }
-
-  // if (newUserAllData) {
-  //   await RedisClient.publish(
-  //     EVENT_USER_CREATED,
-  //     JSON.stringify(newUserAllData.profile)
-  //   );
-  // }
 
   return newUserAllData;
 };
