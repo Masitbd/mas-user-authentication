@@ -70,13 +70,22 @@ const forgotPass = catchAsync(async (req: Request, res: Response) => {
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization || '';
-  await AuthService.resetPassword(req.body, token);
+  await AuthService.resetPassword(req.body);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Account recovered!',
+  });
+});
+
+const changePaswordByAdmin = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.changePasswordBySuperAdmin(req?.user, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Password has been changed',
   });
 });
 
@@ -86,4 +95,5 @@ export const AuthController = {
   changePassword,
   forgotPass,
   resetPassword,
+  changePaswordByAdmin,
 };

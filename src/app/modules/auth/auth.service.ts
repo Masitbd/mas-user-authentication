@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
+import { ENUM_USER_PEMISSION } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { Profile } from '../profile/profile.model';
@@ -13,6 +14,7 @@ import {
   ILoginUserResponse,
   IRefreshTokenResponse,
 } from './auth.interface';
+import { sendEmail } from './sendResetMail';
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { uuid, password } = payload;
@@ -150,58 +152,92 @@ const forgotPass = async (payload: { uuid: string }) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist!');
   }
 
-  const profile = Profile.findOne({ uuid: payload.uuid });
+  const profile = await Profile.findOne({ uuid: payload.uuid });
 
   if (!profile) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Pofile not found!');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Profile not found!');
   }
 
   const passResetToken = await jwtHelpers.createResetToken(
-    { id: user.id },
+    { uuid: user.uuid },
     config.jwt.secret as string,
     '50m'
   );
 
-  const resetLink: string = config.resetlink + `token=${passResetToken}`;
+  const resetLink: string = config.resetlink + '/' + `${passResetToken}`;
 
-  // await sendEmail(
-  //   profile?.email,
-  //   `
-  //     <div>
-  //       <p>Hi, ${profile.name}</p>
-  //       <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
-  //       <p>Thank you</p>
-  //     </div>
-  // `
-  // );
-
-  // return {
-  //   message: "Check your email!"
-  // }
-};
-
-const resetPassword = async (
-  payload: { id: string; newPassword: string },
-  token: string
-) => {
-  const { id, newPassword } = payload;
-  const user = await User.findOne({ id }, { id: 1 });
-
-  if (!user) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'User not found!');
+  if (!profile?.email) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email not found!');
   }
 
+  await sendEmail(
+    profile?.email,
+    `
+      <div>
+        <p>Hi, ${profile.name}</p>
+        <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
+        <p>Thank you</p>
+      </div>
+  `
+  );
+
+  return {
+    message:
+      'A Password reset link Has been sent to you Email. Check your email! Also check spam',
+  };
+};
+
+const resetPassword = async (payload: {
+  newPassword: string;
+  token: string;
+}) => {
+  const { newPassword, token } = payload;
   const isVarified = await jwtHelpers.verifyToken(
     token,
     config.jwt.secret as string
   );
+  const user = await User.findOne({ uuid: isVarified?.uuid }, { id: 1 });
+
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User not found!');
+  }
 
   const password = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_salt_rounds)
   );
 
-  await User.updateOne({ id }, { password });
+  await User.updateOne({ uuid: isVarified?.uuid }, { password });
+};
+
+const changePasswordBySuperAdmin = async (
+  user: JwtPayload | null,
+  payload: { id: string; password: string }
+) => {
+  console.log(payload);
+  if (!user?.permissions?.includes(ENUM_USER_PEMISSION.SUPER_ADMIN)) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You are not authorized to change the user password'
+    );
+  }
+
+  const isUserExist = await User.findOne({
+    uuid: payload.id,
+  }).select('+password');
+
+  console.log(isUserExist);
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  // data update
+  isUserExist.password = payload.password;
+  isUserExist.needsPasswordChange = false;
+
+  // updating using save()
+  isUserExist.save();
 };
 
 export const AuthService = {
@@ -210,4 +246,5 @@ export const AuthService = {
   changePassword,
   forgotPass,
   resetPassword,
+  changePasswordBySuperAdmin,
 };
