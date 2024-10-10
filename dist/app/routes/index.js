@@ -7,7 +7,6 @@ const express_1 = __importDefault(require("express"));
 const auth_route_1 = require("../modules/auth/auth.route");
 const permisson_routes_1 = require("../modules/permission/permisson.routes");
 const profile_route_1 = require("../modules/profile/profile.route");
-const superAdmin_routes_1 = require("../modules/superAdmin/superAdmin.routes");
 const user_route_1 = require("../modules/user/user.route");
 const userPermission_routes_1 = require("../modules/userPermissions/userPermission.routes");
 const router = express_1.default.Router();
@@ -32,10 +31,10 @@ const moduleRoutes = [
         path: '/profile',
         route: profile_route_1.ProfileRoutes,
     },
-    {
-        path: '/superAdmin',
-        route: superAdmin_routes_1.SuperAdminRoutes.routes,
-    },
+    // {
+    //   path: '/superAdmin',
+    //   route: SuperAdminRoutes.routes,
+    // },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 exports.default = router;

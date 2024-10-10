@@ -5,8 +5,8 @@ const transpoert = nodemailer.createTransport({
   secure: false,
   port: 587,
   auth: {
-    user: 'maruf9270@hotmail.com',
-    pass: 'xjxqbjknhupvuigj',
+    user: 'marufahmed9270@gmail.com',
+    pass: 'igfpmhfejgssjrpi',
   },
   tls: {
     ciphers: 'SSLv3',
@@ -15,7 +15,7 @@ const transpoert = nodemailer.createTransport({
 
 export const func = async () => {
   const mailData = await transpoert.sendMail({
-    from: 'Maruf925@hotmail.com>',
+    from: 'Marufahmed9270@gmail.com',
     to: 'Maruf9270@gmail.com',
     subject: 'TEst mail',
     text: 'emailBody',

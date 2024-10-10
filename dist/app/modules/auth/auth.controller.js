@@ -80,12 +80,19 @@ const forgotPass = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const resetPassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.headers.authorization || '';
-    yield auth_service_1.AuthService.resetPassword(req.body, token);
+    yield auth_service_1.AuthService.resetPassword(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
         message: 'Account recovered!',
+    });
+}));
+const changePaswordByAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield auth_service_1.AuthService.changePasswordBySuperAdmin(req === null || req === void 0 ? void 0 : req.user, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Password has been changed',
     });
 }));
 exports.AuthController = {
@@ -94,4 +101,5 @@ exports.AuthController = {
     changePassword,
     forgotPass,
     resetPassword,
+    changePaswordByAdmin,
 };

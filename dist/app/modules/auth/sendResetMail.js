@@ -18,7 +18,7 @@ const config_1 = __importDefault(require("../../../config"));
 function sendEmail(to, html) {
     return __awaiter(this, void 0, void 0, function* () {
         const transporter = nodemailer_1.default.createTransport({
-            host: "smtp.gmail.com",
+            host: 'smtp.gmail.com',
             port: 587,
             secure: false,
             auth: {
@@ -29,7 +29,7 @@ function sendEmail(to, html) {
         yield transporter.sendMail({
             from: config_1.default.email,
             to,
-            subject: "Reset Password Link",
+            subject: 'Reset Password Link',
             html, // html body
         });
     });

@@ -20,8 +20,8 @@ const transpoert = nodemailer_1.default.createTransport({
     secure: false,
     port: 587,
     auth: {
-        user: 'maruf9270@hotmail.com',
-        pass: 'xjxqbjknhupvuigj',
+        user: 'marufahmed9270@gmail.com',
+        pass: 'igfpmhfejgssjrpi',
     },
     tls: {
         ciphers: 'SSLv3',
@@ -29,7 +29,7 @@ const transpoert = nodemailer_1.default.createTransport({
 });
 const func = () => __awaiter(void 0, void 0, void 0, function* () {
     const mailData = yield transpoert.sendMail({
-        from: 'Maruf925@hotmail.com>',
+        from: 'Marufahmed9270@gmail.com',
         to: 'Maruf9270@gmail.com',
         subject: 'TEst mail',
         text: 'emailBody',

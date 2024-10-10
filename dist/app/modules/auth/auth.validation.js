@@ -29,8 +29,19 @@ const changePasswordZodSchema = zod_1.z.object({
         }),
     }),
 });
+const changePasswordBYAdmin = zod_1.z.object({
+    body: zod_1.z.object({
+        id: zod_1.z.string({
+            required_error: 'id is required',
+        }),
+        password: zod_1.z.string({
+            required_error: ' password  is required',
+        }),
+    }),
+});
 exports.AuthValidation = {
     loginZodSchema,
     refreshTokenZodSchema,
     changePasswordZodSchema,
+    changePasswordBYAdmin,
 };

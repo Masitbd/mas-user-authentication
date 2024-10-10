@@ -14,13 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../config"));
+const user_1 = require("../../enums/user");
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const jwtHelpers_1 = require("../../helpers/jwtHelpers");
 const auth = (...requiredPermissions) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         //get authorization token
         const token = req.headers.authorization;
-        console.log(req.headers.Authorization);
         if (!token) {
             throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized');
         }
@@ -28,7 +29,10 @@ const auth = (...requiredPermissions) => (req, res, next) => __awaiter(void 0, v
         let verifiedUser = null;
         verifiedUser = jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.secret);
         req.user = verifiedUser; // role  , userid
-        console.log(requiredPermissions);
+        if ((_a = verifiedUser === null || verifiedUser === void 0 ? void 0 : verifiedUser.permissions) === null || _a === void 0 ? void 0 : _a.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN)) {
+            next();
+            return;
+        }
         if (requiredPermissions &&
             !verifiedUser.permissions.some((permission) => requiredPermissions.includes(permission))) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Forbidden');

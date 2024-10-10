@@ -16,10 +16,12 @@ exports.AuthService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
+const user_1 = require("../../../enums/user");
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const profile_model_1 = require("../profile/profile.model");
 const user_model_1 = require("../user/user.model");
+const sendResetMail_1 = require("./sendResetMail");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { uuid, password } = payload;
     // creating instance of User
@@ -103,35 +105,54 @@ const forgotPass = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User does not exist!');
     }
-    const profile = profile_model_1.Profile.findOne({ uuid: payload.uuid });
+    const profile = yield profile_model_1.Profile.findOne({ uuid: payload.uuid });
     if (!profile) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Pofile not found!');
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Profile not found!');
     }
-    const passResetToken = yield jwtHelpers_1.jwtHelpers.createResetToken({ id: user.id }, config_1.default.jwt.secret, '50m');
-    const resetLink = config_1.default.resetlink + `token=${passResetToken}`;
-    // await sendEmail(
-    //   profile?.email,
-    //   `
-    //     <div>
-    //       <p>Hi, ${profile.name}</p>
-    //       <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
-    //       <p>Thank you</p>
-    //     </div>
-    // `
-    // );
-    // return {
-    //   message: "Check your email!"
-    // }
+    const passResetToken = yield jwtHelpers_1.jwtHelpers.createResetToken({ uuid: user.uuid }, config_1.default.jwt.secret, '50m');
+    const resetLink = config_1.default.resetlink + '?' + `token=${passResetToken}`;
+    if (!(profile === null || profile === void 0 ? void 0 : profile.email)) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Email not found!');
+    }
+    yield (0, sendResetMail_1.sendEmail)(profile === null || profile === void 0 ? void 0 : profile.email, `
+      <div>
+        <p>Hi, ${profile.name}</p>
+        <p>Your password reset link: <a href=${resetLink}>Click Here</a></p>
+        <p>Thank you</p>
+      </div>
+  `);
+    return {
+        message: 'A Password reset link Has been sent to you Email. Check your email! Also check spam',
+    };
 });
-const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, newPassword } = payload;
-    const user = yield user_model_1.User.findOne({ id }, { id: 1 });
+const resetPassword = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { newPassword, token } = payload;
+    const isVarified = yield jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.secret);
+    const user = yield user_model_1.User.findOne({ uuid: isVarified === null || isVarified === void 0 ? void 0 : isVarified.uuid }, { id: 1 });
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User not found!');
     }
-    const isVarified = yield jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.secret);
     const password = yield bcrypt_1.default.hash(newPassword, Number(config_1.default.bycrypt_salt_rounds));
-    yield user_model_1.User.updateOne({ id }, { password });
+    yield user_model_1.User.updateOne({ uuid: isVarified === null || isVarified === void 0 ? void 0 : isVarified.uuid }, { password });
+});
+const changePasswordBySuperAdmin = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    console.log(payload);
+    if (!((_a = user === null || user === void 0 ? void 0 : user.permissions) === null || _a === void 0 ? void 0 : _a.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN))) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You are not authorized to change the user password');
+    }
+    const isUserExist = yield user_model_1.User.findOne({
+        uuid: payload.id,
+    }).select('+password');
+    console.log(isUserExist);
+    if (!isUserExist) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
+    }
+    // data update
+    isUserExist.password = payload.password;
+    isUserExist.needsPasswordChange = false;
+    // updating using save()
+    isUserExist.save();
 });
 exports.AuthService = {
     loginUser,
@@ -139,4 +160,5 @@ exports.AuthService = {
     changePassword,
     forgotPass,
     resetPassword,
+    changePasswordBySuperAdmin,
 };

@@ -21,11 +21,7 @@ router.post(
 
 router.get(
   '/',
-  auth(
-    ENUM_USER_PEMISSION.ADMIN,
-    ENUM_USER_PEMISSION.SUPER_ADMIN,
-    ENUM_USER_PEMISSION.USER
-  ),
+  auth(ENUM_USER_PEMISSION.GET_ALL_USER),
   UserController.getAllUser
 );
 

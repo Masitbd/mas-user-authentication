@@ -35,10 +35,9 @@ const createUser = (profile, user) => __awaiter(void 0, void 0, void 0, function
         // set custom id
         user.uuid = id;
         profile.uuid = id;
-        //! Creating user permissions and setting permissions to the user profile. There is a security issue.That is need to be fixed
         const permissionData = { permissions: [3], uuid: id };
         if (user.role == 'super-admin') {
-            permissionData.permissions = [1];
+            throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not allowed to create super Admin');
         }
         const userPermission = yield userPermission_model_1.UserPermission.create([permissionData], {
             session,
@@ -77,12 +76,6 @@ const createUser = (profile, user) => __awaiter(void 0, void 0, void 0, function
             ],
         });
     }
-    // if (newUserAllData) {
-    //   await RedisClient.publish(
-    //     EVENT_USER_CREATED,
-    //     JSON.stringify(newUserAllData.profile)
-    //   );
-    // }
     return newUserAllData;
 });
 const getSIngleUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
