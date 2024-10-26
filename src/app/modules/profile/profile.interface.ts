@@ -6,4 +6,7 @@ export type IProfile = {
   email: string;
   address: string;
   uuid?: string;
+  age: string;
+  dateOfBirth: Date;
+  gender: string;
 };

@@ -11,6 +11,7 @@ export type IUser = {
   passwordChangedAt?: Date;
   profile?: Types.ObjectId | IProfile;
   permissions?: Types.ObjectId | IUserPermission;
+  status: string;
 };
 
 export type IUserResponse = {
@@ -21,6 +22,7 @@ export type IUserResponse = {
   passwordChangedAt?: Date;
   profile?: IProfile;
   permissions?: IUserPermission;
+  status: string;
 };
 export type UserModel = {
   isUserExist(

@@ -21,6 +21,7 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const profile_model_1 = require("../profile/profile.model");
 const user_model_1 = require("../user/user.model");
+const userPermission_model_1 = require("../userPermissions/userPermission.model");
 const sendResetMail_1 = require("./sendResetMail");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { uuid, password } = payload;
@@ -38,6 +39,10 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
     //create access token & refresh token
     const { uuid: userId, role, needsPasswordChange, permissions, } = isUserExist;
+    // checking is the user is rusticate
+    if (permissions && !(permissions === null || permissions === void 0 ? void 0 : permissions.permissions.length)) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Your account has been rusticate. Please contact administrator');
+    }
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ uuid: userId, role, permissions: permissions === null || permissions === void 0 ? void 0 : permissions.permissions }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ userId, role, permissions }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
     return {
@@ -110,7 +115,7 @@ const forgotPass = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Profile not found!');
     }
     const passResetToken = yield jwtHelpers_1.jwtHelpers.createResetToken({ uuid: user.uuid }, config_1.default.jwt.secret, '50m');
-    const resetLink = config_1.default.resetlink + '?' + `token=${passResetToken}`;
+    const resetLink = config_1.default.resetlink + '/' + `${passResetToken}`;
     if (!(profile === null || profile === void 0 ? void 0 : profile.email)) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Email not found!');
     }
@@ -154,6 +159,28 @@ const changePasswordBySuperAdmin = (user, payload) => __awaiter(void 0, void 0, 
     // updating using save()
     isUserExist.save();
 });
+const rusticateUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!payload) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Invalid user id');
+    }
+    const doesUserExists = yield user_model_1.User.findOne({ _id: payload });
+    if (!doesUserExists) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
+    }
+    const userPermissions = yield userPermission_model_1.UserPermission.findOne({
+        uuid: doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.uuid,
+    });
+    if (!userPermissions) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User permissions not found');
+    }
+    if (userPermissions.permissions.length &&
+        userPermissions.permissions.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN)) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Super admin cannot be rusticated');
+    }
+    userPermissions.permissions = [];
+    userPermissions.save();
+    return 'User Has been successfully rusticated';
+});
 exports.AuthService = {
     loginUser,
     refreshToken,
@@ -161,4 +188,5 @@ exports.AuthService = {
     forgotPass,
     resetPassword,
     changePasswordBySuperAdmin,
+    rusticateUser,
 };

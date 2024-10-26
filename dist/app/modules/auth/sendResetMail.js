@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendEmail = void 0;
+exports.sendEmail = sendEmail;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = __importDefault(require("../../../config"));
 function sendEmail(to, html) {
@@ -27,11 +27,10 @@ function sendEmail(to, html) {
             },
         });
         yield transporter.sendMail({
-            from: config_1.default.email,
-            to,
-            subject: 'Reset Password Link',
+            from: config_1.default.email, // sender address
+            to, // list of receivers
+            subject: 'Reset Password Link', // Subject line
             html, // html body
         });
     });
 }
-exports.sendEmail = sendEmail;

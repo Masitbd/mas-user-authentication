@@ -34,6 +34,10 @@ function mainFunction() {
             yield mongoose_1.default.connect(index_1.default.database_url);
             // logger.info(`🛢   Database is connected successfully`);
             console.log(`\u{2705} 🛢   Database is connected successfully`);
+            server = app_1.default.listen(index_1.default.port, () => {
+                // logger.info(`Application  listening on port ${config.port}`);
+                console.log(` \u{2705} Application  listening on port ${index_1.default.port}`);
+            });
             // Permission Inserter
             yield (0, PermissionInserter_1.permissionInserter)()
                 .then()
@@ -50,10 +54,6 @@ function mainFunction() {
                 spinnerStopper();
                 console.log('\u{274C} Super Admin exists. Not Inserting New');
             }
-            server = app_1.default.listen(index_1.default.port, () => {
-                // logger.info(`Application  listening on port ${config.port}`);
-                console.log(` \u{2705} Application  listening on port ${index_1.default.port}`);
-            });
         }
         catch (err) {
             // errorlogger.error('Failed to connect database', err);

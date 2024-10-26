@@ -17,4 +17,5 @@ router.post('/change-password', (0, validateRequest_1.default)(auth_validation_1
 router.post('/forgot-password', auth_controller_1.AuthController.forgotPass);
 router.post('/reset-password', auth_controller_1.AuthController.resetPassword);
 router.post('/change-password-by-admin', (0, validateRequest_1.default)(auth_validation_1.AuthValidation.changePasswordBYAdmin), (0, auth_1.default)(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN), auth_controller_1.AuthController.changePaswordByAdmin);
+router.post('/rusticate-user', (0, auth_1.default)(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN), auth_controller_1.AuthController.rusticateUser);
 exports.AuthRoutes = router;

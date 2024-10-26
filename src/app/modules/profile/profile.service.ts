@@ -1,3 +1,6 @@
+import httpStatus from 'http-status';
+import { ENUM_STATUS } from '../../../constants/EnumStatus';
+import ApiError from '../../../errors/ApiError';
 import { IGenericDecodedTokenData } from '../../../interfaces/common';
 import { User } from '../user/user.model';
 import { IProfile } from './profile.interface';
@@ -45,6 +48,9 @@ const fetchSIngleUserProfileData = async (data: IGenericDecodedTokenData) => {
     },
   ]);
 
+  if (result[0]?.status == ENUM_STATUS.RUSTICATED) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Your acount has been rusticate');
+  }
   return result;
 };
 

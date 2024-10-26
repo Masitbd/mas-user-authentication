@@ -2,12 +2,14 @@ import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
+import { ENUM_STATUS } from '../../../constants/EnumStatus';
 import { ENUM_USER_PEMISSION } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { Profile } from '../profile/profile.model';
 import { IUserResponse } from '../user/user.interface';
 import { User } from '../user/user.model';
+import { UserPermission } from '../userPermissions/userPermission.model';
 import {
   IChangePassword,
   ILoginUser,
@@ -43,7 +45,22 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     role,
     needsPasswordChange,
     permissions,
+    status,
   } = isUserExist as IUserResponse;
+
+  // checking is the user is rusticate
+  if (permissions && !permissions?.permissions.length) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'Your account has been rusticated. Please contact administrator'
+    );
+  }
+  if (status == ENUM_STATUS.RUSTICATED) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'Your account has been rusticated. Please contact administrator'
+    );
+  }
 
   const accessToken = jwtHelpers.createToken(
     { uuid: userId, role, permissions: permissions?.permissions },
@@ -240,6 +257,83 @@ const changePasswordBySuperAdmin = async (
   isUserExist.save();
 };
 
+const rusticateUser = async (payload: string) => {
+  if (!payload) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid user id');
+  }
+
+  const doesUserExists = await User.findOne({ _id: payload });
+  if (!doesUserExists) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  const userPermissions = await UserPermission.findOne({
+    uuid: doesUserExists?.uuid,
+  });
+
+  if (!userPermissions) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User permissions not found');
+  }
+
+  if (
+    userPermissions.permissions.length &&
+    userPermissions.permissions.includes(ENUM_USER_PEMISSION.SUPER_ADMIN)
+  ) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'Super admin cannot be rusticated'
+    );
+  }
+
+  doesUserExists.status = ENUM_STATUS.RUSTICATED;
+  const result = await User.findOneAndUpdate(
+    {
+      uuid: doesUserExists?.uuid,
+    },
+    { status: ENUM_STATUS.RUSTICATED }
+  );
+
+  return 'User Has been successfully rusticated';
+};
+
+const makeUserActive = async (payload: string) => {
+  if (!payload) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid user id');
+  }
+
+  const doesUserExists = await User.findOne({ _id: payload });
+  if (!doesUserExists) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  const userPermissions = await UserPermission.findOne({
+    uuid: doesUserExists?.uuid,
+  });
+
+  if (!userPermissions) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User permissions not found');
+  }
+
+  if (
+    userPermissions.permissions.length &&
+    userPermissions.permissions.includes(ENUM_USER_PEMISSION.SUPER_ADMIN)
+  ) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'Super admin status cannot be changed'
+    );
+  }
+
+  doesUserExists.status = ENUM_STATUS.RUSTICATED;
+  const result = await User.findOneAndUpdate(
+    {
+      uuid: doesUserExists?.uuid,
+    },
+    { status: ENUM_STATUS.ACTIVE }
+  );
+
+  return 'User Has been successfully Activated';
+};
 export const AuthService = {
   loginUser,
   refreshToken,
@@ -247,4 +341,6 @@ export const AuthService = {
   forgotPass,
   resetPassword,
   changePasswordBySuperAdmin,
+  rusticateUser,
+  makeUserActive,
 };

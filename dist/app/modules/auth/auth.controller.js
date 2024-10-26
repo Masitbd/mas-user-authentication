@@ -95,6 +95,14 @@ const changePaswordByAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(v
         message: 'Password has been changed',
     });
 }));
+const rusticateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield auth_service_1.AuthService.rusticateUser(req.body.id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User has been rusticated',
+    });
+}));
 exports.AuthController = {
     loginUser,
     refreshToken,
@@ -102,4 +110,5 @@ exports.AuthController = {
     forgotPass,
     resetPassword,
     changePaswordByAdmin,
+    rusticateUser,
 };

@@ -28,6 +28,11 @@ async function mainFunction() {
     // logger.info(`🛢   Database is connected successfully`);
     console.log(`\u{2705} 🛢   Database is connected successfully`);
 
+    server = app.listen(config.port, () => {
+      // logger.info(`Application  listening on port ${config.port}`);
+      console.log(` \u{2705} Application  listening on port ${config.port}`);
+    });
+
     // Permission Inserter
 
     await permissionInserter()
@@ -45,11 +50,6 @@ async function mainFunction() {
       spinnerStopper();
       console.log('\u{274C} Super Admin exists. Not Inserting New');
     }
-
-    server = app.listen(config.port, () => {
-      // logger.info(`Application  listening on port ${config.port}`);
-      console.log(` \u{2705} Application  listening on port ${config.port}`);
-    });
   } catch (err) {
     // errorlogger.error('Failed to connect database', err);
     console.log(err);

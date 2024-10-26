@@ -39,4 +39,16 @@ router.post(
   AuthController.changePaswordByAdmin
 );
 
+router.post(
+  '/rusticate-user',
+  auth(ENUM_USER_PEMISSION.SUPER_ADMIN),
+  AuthController.rusticateUser
+);
+
+router.post(
+  '/activate-user',
+  auth(ENUM_USER_PEMISSION.SUPER_ADMIN),
+  AuthController.makeUserActive
+);
+
 export const AuthRoutes = router;

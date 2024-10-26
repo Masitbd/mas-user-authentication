@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.startSpinner = void 0;
+exports.startSpinner = startSpinner;
 const process_1 = require("process");
 function startSpinner(params) {
     const characters = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -21,4 +21,3 @@ function startSpinner(params) {
         process_1.stdout.write('\n');
     };
 }
-exports.startSpinner = startSpinner;

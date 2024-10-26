@@ -17,6 +17,9 @@ exports.default = {
         email: process.env.SUPER_ADMIN_EMAIL,
         password: process.env.SUPER_ADMIN_PASSWORD,
         phone: process.env.SUPER_ADMIN_PHONE,
+        age: process.env.SUPER_ADMIN_AGE,
+        dateOfBirth: process.env.SUPER_ADMIN_DATE_OF_BIRTH,
+        gender: process.env.SUPER_ADMIN_GENDER,
     },
     jwt: {
         secret: process.env.JWT_SECRET,
