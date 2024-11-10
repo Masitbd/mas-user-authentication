@@ -49,6 +49,7 @@ const postSuperAdmin = async () => {
       uuid: id,
       profile: profile[0]._id,
       permissions: permission[0]._id,
+      status: 'active',
     };
 
     const user = await User.create([userData], { session });

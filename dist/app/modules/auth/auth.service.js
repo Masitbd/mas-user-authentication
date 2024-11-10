@@ -16,6 +16,7 @@ exports.AuthService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
+const EnumStatus_1 = require("../../../constants/EnumStatus");
 const user_1 = require("../../../enums/user");
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
@@ -38,10 +39,13 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Password is incorrect');
     }
     //create access token & refresh token
-    const { uuid: userId, role, needsPasswordChange, permissions, } = isUserExist;
+    const { uuid: userId, role, needsPasswordChange, permissions, status, } = isUserExist;
     // checking is the user is rusticate
     if (permissions && !(permissions === null || permissions === void 0 ? void 0 : permissions.permissions.length)) {
-        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Your account has been rusticate. Please contact administrator');
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Your account has been rusticated. Please contact administrator');
+    }
+    if (status == EnumStatus_1.ENUM_STATUS.RUSTICATED) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Your account has been rusticated. Please contact administrator');
     }
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ uuid: userId, role, permissions: permissions === null || permissions === void 0 ? void 0 : permissions.permissions }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ userId, role, permissions }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
@@ -177,9 +181,35 @@ const rusticateUser = (payload) => __awaiter(void 0, void 0, void 0, function* (
         userPermissions.permissions.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN)) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Super admin cannot be rusticated');
     }
-    userPermissions.permissions = [];
-    userPermissions.save();
+    doesUserExists.status = EnumStatus_1.ENUM_STATUS.RUSTICATED;
+    const result = yield user_model_1.User.findOneAndUpdate({
+        uuid: doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.uuid,
+    }, { status: EnumStatus_1.ENUM_STATUS.RUSTICATED });
     return 'User Has been successfully rusticated';
+});
+const makeUserActive = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!payload) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Invalid user id');
+    }
+    const doesUserExists = yield user_model_1.User.findOne({ _id: payload });
+    if (!doesUserExists) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
+    }
+    const userPermissions = yield userPermission_model_1.UserPermission.findOne({
+        uuid: doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.uuid,
+    });
+    if (!userPermissions) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User permissions not found');
+    }
+    if (userPermissions.permissions.length &&
+        userPermissions.permissions.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN)) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Super admin status cannot be changed');
+    }
+    doesUserExists.status = EnumStatus_1.ENUM_STATUS.RUSTICATED;
+    const result = yield user_model_1.User.findOneAndUpdate({
+        uuid: doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.uuid,
+    }, { status: EnumStatus_1.ENUM_STATUS.ACTIVE });
+    return 'User Has been successfully Activated';
 });
 exports.AuthService = {
     loginUser,
@@ -189,4 +219,5 @@ exports.AuthService = {
     resetPassword,
     changePasswordBySuperAdmin,
     rusticateUser,
+    makeUserActive,
 };

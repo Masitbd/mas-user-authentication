@@ -137,6 +137,26 @@ const getALluser = () => __awaiter(void 0, void 0, void 0, function* () {
                 preserveNullAndEmptyArrays: true,
             },
         },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'uuid',
+                foreignField: 'uuid',
+                as: 'user',
+            },
+        },
+        {
+            $unwind: {
+                path: '$user',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $project: {
+                'user.password': 0,
+                'user.permissions': 0,
+            },
+        },
     ]);
     return result;
 });

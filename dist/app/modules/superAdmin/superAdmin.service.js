@@ -57,6 +57,7 @@ const postSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
             uuid: id,
             profile: profile[0]._id,
             permissions: permission[0]._id,
+            status: 'active',
         };
         const user = yield user_model_1.User.create([userData], { session });
         if (!(user === null || user === void 0 ? void 0 : user.length)) {

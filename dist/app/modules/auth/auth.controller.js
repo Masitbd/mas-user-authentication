@@ -103,6 +103,14 @@ const rusticateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         message: 'User has been rusticated',
     });
 }));
+const makeUserActive = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield auth_service_1.AuthService.makeUserActive(req.body.id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User has been Activated',
+    });
+}));
 exports.AuthController = {
     loginUser,
     refreshToken,
@@ -111,4 +119,5 @@ exports.AuthController = {
     resetPassword,
     changePaswordByAdmin,
     rusticateUser,
+    makeUserActive,
 };

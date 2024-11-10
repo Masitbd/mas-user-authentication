@@ -43,6 +43,10 @@ const UserSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'UserPermission',
     },
+    status: {
+        type: String,
+        default: 'active',
+    },
 }, {
     timestamps: true,
     toJSON: {
@@ -51,7 +55,14 @@ const UserSchema = new mongoose_1.Schema({
 });
 UserSchema.statics.isUserExist = function (uuid) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({ uuid: uuid }, { uuid: 1, password: 1, role: 1, needsPasswordChange: 1, permissions: 1 }).populate('permissions');
+        return yield exports.User.findOne({ uuid: uuid }, {
+            uuid: 1,
+            password: 1,
+            role: 1,
+            needsPasswordChange: 1,
+            permissions: 1,
+            status: 1,
+        }).populate('permissions');
     });
 };
 UserSchema.statics.isPasswordMatched = function (givenPassword, savedPassword) {
