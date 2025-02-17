@@ -3,7 +3,6 @@ import { AuthRoutes } from '../modules/auth/auth.route';
 
 import { PermissionRoutes } from '../modules/permission/permisson.routes';
 import { ProfileRoutes } from '../modules/profile/profile.route';
-import { SuperAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
 import { UserRoutes } from '../modules/user/user.route';
 import { UserPermissionRoutes } from '../modules/userPermissions/userPermission.routes';
 
@@ -30,10 +29,10 @@ const moduleRoutes = [
     path: '/profile',
     route: ProfileRoutes,
   },
-  {
-    path: '/superAdmin',
-    route: SuperAdminRoutes.routes,
-  },
+  // {
+  //   path: '/superAdmin',
+  //   route: SuperAdminRoutes.routes,
+  // },
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.route));

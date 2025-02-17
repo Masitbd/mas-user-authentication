@@ -31,6 +31,10 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: Schema.Types.ObjectId,
       ref: 'UserPermission',
     },
+    status: {
+      type: String,
+      default: 'active',
+    },
   },
   {
     timestamps: true,
@@ -45,7 +49,14 @@ UserSchema.statics.isUserExist = async function (
 ): Promise<IUser | null> {
   return await User.findOne(
     { uuid: uuid },
-    { uuid: 1, password: 1, role: 1, needsPasswordChange: 1, permissions: 1 }
+    {
+      uuid: 1,
+      password: 1,
+      role: 1,
+      needsPasswordChange: 1,
+      permissions: 1,
+      status: 1,
+    }
   ).populate('permissions');
 };
 

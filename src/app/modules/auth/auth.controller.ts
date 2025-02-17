@@ -70,8 +70,7 @@ const forgotPass = catchAsync(async (req: Request, res: Response) => {
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization || '';
-  await AuthService.resetPassword(req.body, token);
+  await AuthService.resetPassword(req.body);
 
   sendResponse(res, {
     statusCode: 200,
@@ -80,10 +79,42 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const changePaswordByAdmin = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.changePasswordBySuperAdmin(req?.user, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Password has been changed',
+  });
+});
+
+const rusticateUser = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.rusticateUser(req.body.id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User has been rusticated',
+  });
+});
+
+const makeUserActive = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.makeUserActive(req.body.id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User has been Activated',
+  });
+});
 export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
   forgotPass,
   resetPassword,
+  changePaswordByAdmin,
+  rusticateUser,
+  makeUserActive,
 };

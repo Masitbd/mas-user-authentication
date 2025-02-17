@@ -10,6 +10,9 @@ const profileSchema = new Schema<IProfile>(
     email: { type: String, required: true },
     phone: { type: String, required: true },
     uuid: { type: String, required: true, unique: true },
+    age: { type: String },
+    dateOfBirth: { type: Date, required: true },
+    gender: { type: String, required: true },
   },
   {
     timestamps: true,

@@ -8,6 +8,11 @@ export const superAdminProfile: IProfile = {
   phone: config.superAdmin.phone || '123456789',
   email: config.superAdmin.email || 'superadmin@gmail.com',
   address: 'Super Admin',
+  age: config.superAdmin.age || '24 year(s)',
+  dateOfBirth:
+    (config.superAdmin.dateOfBirth as unknown as Date) ||
+    (new Date('1996-01-01') as Date),
+  gender: config.superAdmin.gender || 'male',
 };
 
 export const superAdminUserConfig = {
