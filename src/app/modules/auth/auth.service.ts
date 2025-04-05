@@ -124,9 +124,9 @@ const changePassword = async (
 ): Promise<void> => {
   const { oldPassword, newPassword } = payload;
 
-  const isUserExist = await User.findOne({ id: user?.userId }).select(
-    '+password'
-  );
+  const storedUser = await User.find({ uuid: user?.uuid }).select('+password');
+
+  const isUserExist = storedUser?.length ? storedUser[0] : undefined;
 
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
@@ -231,7 +231,6 @@ const changePasswordBySuperAdmin = async (
   user: JwtPayload | null,
   payload: { id: string; password: string }
 ) => {
-  console.log(payload);
   if (!user?.permissions?.includes(ENUM_USER_PEMISSION.SUPER_ADMIN)) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
