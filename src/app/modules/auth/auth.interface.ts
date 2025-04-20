@@ -1,8 +1,9 @@
 import { ENUM_USER_PEMISSION } from '../../../enums/user';
 
 export type ILoginUser = {
-  uuid: string;
+  uuid?: string;
   password: string;
+  email: string;
 };
 
 export type ILoginUserResponse = {

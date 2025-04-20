@@ -55,7 +55,18 @@ const fetchSIngleUserProfileData = async (data: IGenericDecodedTokenData) => {
 };
 
 const patchProfile = async (uuid: string, profileData: IProfile) => {
+  const doesUserExists = await User.findOne({ uuid: uuid });
+  if (!doesUserExists) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  if (profileData?.email && doesUserExists?.email) {
+    if (profileData.email !== doesUserExists?.email) {
+      await User.findOneAndUpdate({ uuid: uuid, email: profileData.email });
+    }
+  }
   const result = await Profile.findOneAndUpdate({ uuid: uuid }, profileData);
+
   return result;
 };
 export const ProfileService = { fetchSIngleUserProfileData, patchProfile };

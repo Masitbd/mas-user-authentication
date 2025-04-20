@@ -47,22 +47,42 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         default: 'active',
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+    },
 }, {
     timestamps: true,
     toJSON: {
         virtuals: true,
     },
 });
-UserSchema.statics.isUserExist = function (uuid) {
+UserSchema.statics.isUserExist = function (uuid, email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({ uuid: uuid }, {
-            uuid: 1,
-            password: 1,
-            role: 1,
-            needsPasswordChange: 1,
-            permissions: 1,
-            status: 1,
-        }).populate('permissions');
+        if (!email && uuid) {
+            return yield exports.User.findOne({ uuid: uuid }, {
+                uuid: 1,
+                password: 1,
+                role: 1,
+                needsPasswordChange: 1,
+                permissions: 1,
+                status: 1,
+            }).populate('permissions');
+        }
+        if (email) {
+            return yield exports.User.findOne({ email: email }, {
+                uuid: 1,
+                password: 1,
+                role: 1,
+                needsPasswordChange: 1,
+                permissions: 1,
+                status: 1,
+            }).populate('permissions');
+        }
+        else
+            return null;
     });
 };
 UserSchema.statics.isPasswordMatched = function (givenPassword, savedPassword) {

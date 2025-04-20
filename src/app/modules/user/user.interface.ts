@@ -12,6 +12,7 @@ export type IUser = {
   profile?: Types.ObjectId | IProfile;
   permissions?: Types.ObjectId | IUserPermission;
   status: string;
+  email: string;
 };
 
 export type IUserResponse = {
@@ -26,7 +27,8 @@ export type IUserResponse = {
 };
 export type UserModel = {
   isUserExist(
-    uuid: string
+    uuid: string,
+    email?: string
   ): Promise<
     Pick<
       IUser,

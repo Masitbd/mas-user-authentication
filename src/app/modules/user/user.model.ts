@@ -35,6 +35,12 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: String,
       default: 'active',
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
   },
   {
     timestamps: true,
@@ -45,19 +51,35 @@ const UserSchema = new Schema<IUser, UserModel>(
 );
 
 UserSchema.statics.isUserExist = async function (
-  uuid: string
+  uuid: string,
+  email?: string
 ): Promise<IUser | null> {
-  return await User.findOne(
-    { uuid: uuid },
-    {
-      uuid: 1,
-      password: 1,
-      role: 1,
-      needsPasswordChange: 1,
-      permissions: 1,
-      status: 1,
-    }
-  ).populate('permissions');
+  if (!email && uuid) {
+    return await User.findOne(
+      { uuid: uuid },
+      {
+        uuid: 1,
+        password: 1,
+        role: 1,
+        needsPasswordChange: 1,
+        permissions: 1,
+        status: 1,
+      }
+    ).populate('permissions');
+  }
+  if (email) {
+    return await User.findOne(
+      { email: email },
+      {
+        uuid: 1,
+        password: 1,
+        role: 1,
+        needsPasswordChange: 1,
+        permissions: 1,
+        status: 1,
+      }
+    ).populate('permissions');
+  } else return null;
 };
 
 UserSchema.statics.isPasswordMatched = async function (

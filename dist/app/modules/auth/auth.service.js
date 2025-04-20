@@ -25,12 +25,12 @@ const user_model_1 = require("../user/user.model");
 const userPermission_model_1 = require("../userPermissions/userPermission.model");
 const sendResetMail_1 = require("./sendResetMail");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { uuid, password } = payload;
+    const { uuid, password, email } = payload;
     // creating instance of User
     // const user = new User();
     //  // access to our instance methods
     //   const isUserExist = await user.isUserExist(id);
-    const isUserExist = yield user_model_1.User.isUserExist(uuid);
+    const isUserExist = yield user_model_1.User.isUserExist(uuid, email);
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
     }
@@ -82,7 +82,8 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const changePassword = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { oldPassword, newPassword } = payload;
-    const isUserExist = yield user_model_1.User.findOne({ id: user === null || user === void 0 ? void 0 : user.userId }).select('+password');
+    const storedUser = yield user_model_1.User.find({ uuid: user === null || user === void 0 ? void 0 : user.uuid }).select('+password');
+    const isUserExist = (storedUser === null || storedUser === void 0 ? void 0 : storedUser.length) ? storedUser[0] : undefined;
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
     }
@@ -110,11 +111,11 @@ const changePassword = (user, payload) => __awaiter(void 0, void 0, void 0, func
     isUserExist.save();
 });
 const forgotPass = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findOne({ uuid: payload.uuid }, { uuid: 1, role: 1 });
+    const user = yield user_model_1.User.findOne({ email: payload.email }, { uuid: 1, role: 1 });
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User does not exist!');
     }
-    const profile = yield profile_model_1.Profile.findOne({ uuid: payload.uuid });
+    const profile = yield profile_model_1.Profile.findOne({ uuid: user === null || user === void 0 ? void 0 : user.uuid });
     if (!profile) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Profile not found!');
     }
@@ -146,7 +147,6 @@ const resetPassword = (payload) => __awaiter(void 0, void 0, void 0, function* (
 });
 const changePasswordBySuperAdmin = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    console.log(payload);
     if (!((_a = user === null || user === void 0 ? void 0 : user.permissions) === null || _a === void 0 ? void 0 : _a.includes(user_1.ENUM_USER_PEMISSION.SUPER_ADMIN))) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You are not authorized to change the user password');
     }

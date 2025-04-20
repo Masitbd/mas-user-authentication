@@ -19,13 +19,13 @@ import {
 import { sendEmail } from './sendResetMail';
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
-  const { uuid, password } = payload;
+  const { uuid, password, email } = payload;
   // creating instance of User
   // const user = new User();
   //  // access to our instance methods
   //   const isUserExist = await user.isUserExist(id);
 
-  const isUserExist = await User.isUserExist(uuid);
+  const isUserExist = await User.isUserExist(uuid as string, email);
 
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
@@ -162,14 +162,17 @@ const changePassword = async (
   isUserExist.save();
 };
 
-const forgotPass = async (payload: { uuid: string }) => {
-  const user = await User.findOne({ uuid: payload.uuid }, { uuid: 1, role: 1 });
+const forgotPass = async (payload: { email: string }) => {
+  const user = await User.findOne(
+    { email: payload.email },
+    { uuid: 1, role: 1 }
+  );
 
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist!');
   }
 
-  const profile = await Profile.findOne({ uuid: payload.uuid });
+  const profile = await Profile.findOne({ uuid: user?.uuid });
 
   if (!profile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Profile not found!');

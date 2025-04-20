@@ -66,6 +66,15 @@ const fetchSIngleUserProfileData = (data) => __awaiter(void 0, void 0, void 0, f
     return result;
 });
 const patchProfile = (uuid, profileData) => __awaiter(void 0, void 0, void 0, function* () {
+    const doesUserExists = yield user_model_1.User.findOne({ uuid: uuid });
+    if (!doesUserExists) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+    }
+    if ((profileData === null || profileData === void 0 ? void 0 : profileData.email) && (doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.email)) {
+        if (profileData.email !== (doesUserExists === null || doesUserExists === void 0 ? void 0 : doesUserExists.email)) {
+            yield user_model_1.User.findOneAndUpdate({ uuid: uuid, email: profileData.email });
+        }
+    }
     const result = yield profile_model_1.Profile.findOneAndUpdate({ uuid: uuid }, profileData);
     return result;
 });

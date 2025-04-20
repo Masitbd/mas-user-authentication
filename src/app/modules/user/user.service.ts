@@ -167,6 +167,8 @@ const getALluser = async () => {
     },
   ]);
 
+  console.log(result);
+
   return result;
 };
 
