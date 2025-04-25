@@ -158,6 +158,7 @@ const getALluser = () => __awaiter(void 0, void 0, void 0, function* () {
             },
         },
     ]);
+    console.log(result);
     return result;
 });
 const patchUser = (uuid, data) => __awaiter(void 0, void 0, void 0, function* () {

@@ -167,7 +167,6 @@ const forgotPass = async (payload: { email: string }) => {
     { email: payload.email },
     { uuid: 1, role: 1 }
   );
-
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist!');
   }
