@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import config from '../../../config/index';
 import ApiError from '../../../errors/ApiError';
@@ -129,8 +130,8 @@ const getSIngleUser = async (data: Partial<IUser>) => {
   return result;
 };
 
-const getALluser = async () => {
-  const result = await Profile.aggregate([
+const getALluser = async (user: JwtPayload) => {
+  const aggrigatonPipeline = [
     {
       $lookup: {
         from: 'userpermissions',
@@ -165,9 +166,17 @@ const getALluser = async () => {
         'user.permissions': 0,
       },
     },
-  ]);
+  ];
 
-  console.log(result);
+  if (user?.role !== 'super-admin') {
+    aggrigatonPipeline.push({
+      $match: {
+        'user.role': { $ne: 'super-admin' },
+      },
+    } as any);
+  }
+
+  const result = await Profile.aggregate(aggrigatonPipeline);
 
   return result;
 };

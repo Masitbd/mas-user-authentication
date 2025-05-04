@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 
+import { JwtPayload } from 'jsonwebtoken';
 import { IGenericDecodedTokenData } from '../../../interfaces/common';
 import { ProfileService } from './profile.service';
 
@@ -22,7 +23,11 @@ const getSingleUserProfile: RequestHandler = catchAsync(
 );
 const updateProfile: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await ProfileService.patchProfile(req.params.uuid, req.body);
+    const result = await ProfileService.patchProfile(
+      req.params.uuid,
+      req.body,
+      req.user as JwtPayload
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express-serve-static-core';
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { IUser } from './user.interface';
@@ -34,7 +35,7 @@ const getSingleUser: RequestHandler = catchAsync(
 );
 const getAllUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await UserService.getALluser();
+    const result = await UserService.getALluser(req.user as JwtPayload);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

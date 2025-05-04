@@ -244,8 +244,6 @@ const changePasswordBySuperAdmin = async (
     uuid: payload.id,
   }).select('+password');
 
-  console.log(isUserExist);
-
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
