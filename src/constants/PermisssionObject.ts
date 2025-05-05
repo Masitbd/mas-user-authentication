@@ -41,4 +41,5 @@ export const permissionData = [
   { label: 'MANAGE_COMMENT', code: 42 },
   { label: 'GET_DOCTORS_SEAL', code: 43 },
   { label: 'MANAGE_DOCTORS_SEAL', code: 44 },
+  { label: 'DELIVER_TEST_REPORT', code: 45 },
 ];
