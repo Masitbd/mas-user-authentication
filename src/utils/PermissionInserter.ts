@@ -12,7 +12,10 @@ export const permissionInserter = async () => {
   const permissionPromises = permissions.map(async p => {
     const doesExists = await Permission.exists({ code: p.code });
     if (!doesExists) {
-      await Permission.create(p);
+      await Permission.create({
+        label: p.label.split('_').join(' ').toLocaleString(),
+        code: p.code,
+      });
     }
   });
 
